@@ -1,0 +1,14 @@
+{
+  "functions": {
+    "api/auth/login.js": {
+      "maxDuration": 10
+    },
+    "api/auth/callback.js": {
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    { "source": "/api/auth/login", "destination": "/api/auth/login.js" },
+    { "source": "/api/auth/callback", "destination": "/api/auth/callback.js" }
+  ]
+}
