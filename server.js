@@ -1,10 +1,16 @@
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-// Removed deprecated url module - using URL constructor instead
+import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import dotenv from 'dotenv';
 
 // Load environment variables from .env file
-require('dotenv').config();
+dotenv.config();
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const PORT = process.env.PORT || 3000;
 
@@ -42,9 +48,9 @@ const server = http.createServer(async (req, res) => {
       // Import the API handler
       const apiPath = path.join(__dirname, pathname + '.js');
       if (fs.existsSync(apiPath)) {
-        // Clear require cache for hot reloading
-        delete require.cache[require.resolve(apiPath)];
-        const handler = require(apiPath).default;
+        // Dynamic import for ES modules
+        const module = await import(`file://${apiPath}?t=${Date.now()}`);
+        const handler = module.default;
         
         // Create mock req/res objects similar to Vercel
         const mockReq = {
