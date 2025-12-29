@@ -8,11 +8,13 @@ export default async function handler(req, res) {
   const { code, state, error } = req.query;
 
   if (error) {
-    return res.redirect(`/?error=${encodeURIComponent(error)}`);
+    console.log('OAuth Error:', error);
+    return res.redirect(`/?error=${encodeURIComponent(`OAuth failed: ${error}`)}`);
   }
 
   if (!code || !state) {
-    return res.redirect('/?error=missing_parameters');
+    console.log('Missing parameters:', { code: !!code, state: !!state });
+    return res.redirect('/?error=missing_oauth_parameters');
   }
 
   try {

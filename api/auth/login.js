@@ -9,8 +9,14 @@ export default async function handler(req, res) {
   const redirectUri = process.env.X_REDIRECT_URI || `${req.headers.origin}/api/auth/callback`;
   
   if (!clientId) {
-    return res.status(500).json({ error: 'OAuth not configured' });
+    return res.status(500).json({ error: 'OAuth not configured - missing X_CLIENT_ID' });
   }
+
+  if (!process.env.X_CLIENT_SECRET) {
+    return res.status(500).json({ error: 'OAuth not configured - missing X_CLIENT_SECRET' });
+  }
+
+  console.log('OAuth Config:', { clientId, redirectUri }); // Debug log
 
   // Generate PKCE challenge
   const codeVerifier = crypto.randomBytes(32).toString('base64url');
@@ -31,7 +37,7 @@ export default async function handler(req, res) {
   authUrl.searchParams.set('response_type', 'code');
   authUrl.searchParams.set('client_id', clientId);
   authUrl.searchParams.set('redirect_uri', redirectUri);
-  authUrl.searchParams.set('scope', 'tweet.read users.read offline.access');
+  authUrl.searchParams.set('scope', 'tweet.read users.read');
   authUrl.searchParams.set('state', encodedState);
   authUrl.searchParams.set('code_challenge', codeChallenge);
   authUrl.searchParams.set('code_challenge_method', 'S256');
